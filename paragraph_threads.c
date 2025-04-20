@@ -173,31 +173,36 @@
      pthread_t threads[NUM_THREADS];
      thread_data_t thread_data[NUM_THREADS];
      
-     // words per thread (at minimum)
-     int words_per_thread = total_words / NUM_THREADS;
+     // total number of chunks we'll divide the paragraph into
+     // each chunk will be processed sequentially
+     int total_chunks = total_words;
      
-     // extra words to distribute among the first few threads
-     int extra_words = total_words % NUM_THREADS;
+     // words per thread (we're doing interleaved assignment)
+     int words_per_thread = (total_chunks + NUM_THREADS - 1) / NUM_THREADS;
      
      // initialize thread data and create threads
-     int word_index = 0;
-     
      for (int i = 0; i < NUM_THREADS; i++) {
          thread_data[i].thread_id = i;
          
-         // calculate number of words for this thread
-         thread_data[i].word_count = words_per_thread + (i < extra_words ? 1 : 0);
+         // count how many words this thread will process
+         int count = 0;
+         for (int j = i; j < total_words; j += NUM_THREADS) {
+             count++;
+         }
+         
+         thread_data[i].word_count = count;
          
          // allocate memory for words
-         thread_data[i].words = (char**)malloc(thread_data[i].word_count * sizeof(char*));
+         thread_data[i].words = (char**)malloc(count * sizeof(char*));
          if (thread_data[i].words == NULL) {
              perror("malloc failed");
              exit(EXIT_FAILURE);
          }
          
-         // assign words to this thread
-         for (int j = 0; j < thread_data[i].word_count; j++) {
-             thread_data[i].words[j] = all_words[word_index++];
+         // assign words to this thread in sequential order
+         int word_pos = 0;
+         for (int j = i; j < total_words; j += NUM_THREADS) {
+             thread_data[i].words[word_pos++] = all_words[j];
          }
          
          // set semaphores for synchronization
