@@ -127,6 +127,9 @@
          if (!data->is_chaos_mode) {
              // normal mode - signal the next thread
              sem_post(data->sem_signal);
+             
+             // wait for a short time to ensure proper order
+             usleep(1000);
          }
      }
      
@@ -176,9 +179,6 @@
      // total number of chunks we'll divide the paragraph into
      // each chunk will be processed sequentially
      int total_chunks = total_words;
-     
-     // words per thread (we're doing interleaved assignment)
-     int words_per_thread = (total_chunks + NUM_THREADS - 1) / NUM_THREADS;
      
      // initialize thread data and create threads
      for (int i = 0; i < NUM_THREADS; i++) {
