@@ -121,13 +121,8 @@
          // add random delay (10-100ms)
          usleep((rand() % 91 + 10) * 1000);
          
-         // print the word
-         printf("Thread %d: %s ", data->thread_id + 1, data->words[i]);
-         
-         // add newline after a complete phrase
-         if (strchr(data->words[i], '.') != NULL) {
-             printf("\n");
-         }
+         // print the word and add a newline after every thread's print
+         printf("Thread %d: %s\n", data->thread_id + 1, data->words[i]);
          
          if (!data->is_chaos_mode) {
              // normal mode - signal the next thread
