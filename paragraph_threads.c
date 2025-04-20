@@ -176,10 +176,6 @@
      pthread_t threads[NUM_THREADS];
      thread_data_t thread_data[NUM_THREADS];
      
-     // total number of chunks we'll divide the paragraph into
-     // each chunk will be processed sequentially
-     int total_chunks = total_words;
-     
      // initialize thread data and create threads
      for (int i = 0; i < NUM_THREADS; i++) {
          thread_data[i].thread_id = i;
